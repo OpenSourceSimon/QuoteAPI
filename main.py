@@ -5,7 +5,7 @@ import re
 
 lang = 'nl'
 # get quote from JSON file and translate it
-with open("file.json", "r") as quotes_file:
+with open("main.json", "r") as quotes_file:
     quotes = json.load(quotes_file)
     if os.path.exists(f"file_{lang}.json"):
         os.remove(f"file_{lang}.json")
