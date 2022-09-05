@@ -48,7 +48,6 @@ with open("main.json", "r") as quotes_file:
         if count < forinfrom:
             count += 1
             continue
-        print(f'Skipped to quote {count}')
         urllib.request.urlretrieve('https://argosopentech.nyc3.digitaloceanspaces.com/argospm/translate-en_nl-1_4.argosmodel', 'translate-en_nl-1_4.argosmodel')
         download_path = "translate-en_nl-1_4.argosmodel"
         argostranslate.package.install_from_path(download_path)
