@@ -14,8 +14,8 @@ def get_argos_model(source, target):
     
     return source_lang[0].get_translation(target_lang[0])
 
-def get_remaining_time(speed, quote_count, count):
-    remaining = (quote_count - count) / speed
+def get_remaining_time(speed, quote_count, forinfrom, count):
+    remaining = (forinto - forinfrom) / speed
     if remaining > 3600:
         return f'{int(round(remaining, 2) / 3600)} hours'
     elif remaining > 60:
@@ -44,7 +44,11 @@ with open("main.json", "r") as quotes_file:
             f.close()
 
     count = 0
-    for quote in quotes[:forinfrom:-forinto]:
+    for quote in quotes:
+        if count < forinfrom:
+            count += 1
+            continue
+        print(f'Skipped to quote {count}')
         urllib.request.urlretrieve('https://argosopentech.nyc3.digitaloceanspaces.com/argospm/translate-en_nl-1_4.argosmodel', 'translate-en_nl-1_4.argosmodel')
         download_path = "translate-en_nl-1_4.argosmodel"
         argostranslate.package.install_from_path(download_path)
@@ -57,10 +61,14 @@ with open("main.json", "r") as quotes_file:
             f.write('"author":"' + str(quote['author']) + '"},')
             f.close()
             count += 1
-            speed = count / (start_time - time.time())  * -1
-            remaining_time = get_remaining_time(speed, quote_count, count)
+            speed = (forinfrom - forinto) / (start_time - time.time())
+            remaining_time = get_remaining_time(speed, quote_count, forinfrom, count)
             print(f'{count} of {quote_count} quotes translated, {round(speed, 3)} quotes/s, {remaining_time} remaining')
-            print("Done with translating quotes. Now reformatting the file")
+        if count == forinto:
+            print(f'Done. Onto the next batch!')
+            count += 1
+            break
+    print("Done with translating quotes. Now reformatting the file")
 
 #Opens the json file and removes the whole quote and author if unkown characters are found
 if forinto == 5000:
