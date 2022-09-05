@@ -34,13 +34,14 @@ with open("main.json", "r") as quotes_file:
     forinfrom = int(sys.argv[1])
     forinto = int(sys.argv[2])
     if os.path.exists(f"file_{lang}.json"):
-        os.remove(f"file_{lang}.json")
+        print("File already exists")
     else:
         print("The file does not exist, generating new file")
     # Add [ to the file and remove all of it contents
-    with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
-        f.write("[")
-        f.close()
+    if forinfrom == 0:
+        with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
+            f.write("[")
+            f.close()
 
     count = 0
     for quote in quotes[:forinfrom:-forinto]:
@@ -62,11 +63,12 @@ with open("main.json", "r") as quotes_file:
             print("Done with translating quotes. Now reformatting the file")
 
 #Opens the json file and removes the whole quote and author if unkown characters are found
-with open(f"file_{lang}.json", 'rb+') as filehandle:
-    filehandle.seek(-1, os.SEEK_END)
-    filehandle.truncate()
-    filehandle.write(']'.encode('utf-8'))
-    filehandle.close()
+if forinto == 5000:
+    with open(f"file_{lang}.json", 'rb+') as filehandle:
+        filehandle.seek(-1, os.SEEK_END)
+        filehandle.truncate()
+        filehandle.write(']'.encode('utf-8'))
+        filehandle.close()
 obj  = json.load(open(f"file_{lang}.json"))
 last_start_time = time.time()
 with open(f"file_{lang}.json", "r") as quotes_file:
