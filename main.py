@@ -4,6 +4,8 @@ from argostranslate import translate
 import os
 import re
 import urllib.request
+import time
+import sys
 
 def get_argos_model(source, target):
     lang = f'{source} -> {target}'
@@ -12,10 +14,25 @@ def get_argos_model(source, target):
     
     return source_lang[0].get_translation(target_lang[0])
 
+def get_remaining_time(speed, quote_count, count):
+    remaining = (quote_count - count) / speed
+    if remaining > 3600:
+        return f'{int(round(remaining, 2) / 3600)} hours'
+    elif remaining > 60:
+        return f'{int(round(remaining, 2) / 60)} minutes'
+    else:
+        return f'{int(round(remaining, 2))} seconds'
+
 lang = 'nl'
+start_time = time.time()
 # get quote from JSON file and translate it
 with open("main.json", "r") as quotes_file:
     quotes = json.load(quotes_file)
+    #gets all the quotes from the JSON file and counts how many there are
+    quote_count = len(quotes)
+    print(f'Loaded {quote_count} quotes')
+    forinfrom = int(sys.argv[1])
+    forinto = int(sys.argv[2])
     if os.path.exists(f"file_{lang}.json"):
         os.remove(f"file_{lang}.json")
     else:
@@ -26,7 +43,7 @@ with open("main.json", "r") as quotes_file:
         f.close()
 
     count = 0
-    for quote in quotes:
+    for quote in quotes[:forinfrom:-forinto]:
         urllib.request.urlretrieve('https://argosopentech.nyc3.digitaloceanspaces.com/argospm/translate-en_nl-1_4.argosmodel', 'translate-en_nl-1_4.argosmodel')
         download_path = "translate-en_nl-1_4.argosmodel"
         argostranslate.package.install_from_path(download_path)
@@ -39,7 +56,10 @@ with open("main.json", "r") as quotes_file:
             f.write('"author":"' + str(quote['author']) + '"},')
             f.close()
             count += 1
-            print(f"Translated {count} quotes")
+            speed = count / (start_time - time.time())  * -1
+            remaining_time = get_remaining_time(speed, quote_count, count)
+            print(f'{count} of {quote_count} quotes translated, {round(speed, 3)} quotes/s, {remaining_time} remaining')
+            print("Done with translating quotes. Now reformatting the file")
 
 #Opens the json file and removes the whole quote and author if unkown characters are found
 with open(f"file_{lang}.json", 'rb+') as filehandle:
@@ -48,16 +68,21 @@ with open(f"file_{lang}.json", 'rb+') as filehandle:
     filehandle.write(']'.encode('utf-8'))
     filehandle.close()
 obj  = json.load(open(f"file_{lang}.json"))
+last_start_time = time.time()
 with open(f"file_{lang}.json", "r") as quotes_file:
     quotes = json.load(quotes_file)
+    num = 0
     for quote in quotes:
         for idx, obj in enumerate(quotes):
             import re
             def corr(s):
                 sub = re.sub(r'\.(?! )', '. ', re.sub(r' +', ' ', s))
-                print(sub)
                 return sub
 
+            num += 1
+            speed = count / (last_start_time - time.time())  * -1
+            remaining_time = get_remaining_time(speed, quote_count, count)
+            print(f'{num} of {quote_count} quotes translated, {round(speed, 3)} quotes/s, {remaining_time} remaining')
             obj['quote'] = corr(obj['quote'])
             if '\u00ef\u00bf\u00bd' in obj['quote']:
                 quotes.pop(idx)
@@ -65,4 +90,5 @@ with open(f"file_{lang}.json", "r") as quotes_file:
 
 with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
     f.write(json.dumps(quotes, indent=2))
-
+    f.close()
+    print("Done with reformatting the file")
