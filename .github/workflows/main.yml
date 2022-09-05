@@ -30,8 +30,20 @@ jobs:
       - name: Install dependencies
         run: pip3 install googletrans==4.0.0rc1 argostranslate
         
-      - name: Run Python
-        run: python main.py
+      - name: Run Python from 0 to 1000
+        run: python main.py 0 1000
+        
+      - name: Run Python from 1000 to 2000
+        run: python main.py 1000 2000
+        
+      - name: Run Python from 2000 to 3000
+        run: python main.py 2000 3000
+        
+      - name: Run Python from 3000 to 4000
+        run: python main.py 3000 4000
+        
+      - name: Run Python from 4000 to 5000
+        run: python main.py 4000 5000
         
       - name: Commit files
         id: commit
