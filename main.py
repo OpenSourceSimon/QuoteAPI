@@ -1,7 +1,16 @@
 import json
-from googletrans import Translator
+import argostranslate.package, argostranslate.translate
+from argostranslate import translate
 import os
 import re
+import urllib.request
+
+def get_argos_model(source, target):
+    lang = f'{source} -> {target}'
+    source_lang = [model for model in translate.get_installed_languages() if lang in map(repr, model.translations_from)]
+    target_lang = [model for model in translate.get_installed_languages() if lang in map(repr, model.translations_to)]
+    
+    return source_lang[0].get_translation(target_lang[0])
 
 lang = 'nl'
 # get quote from JSON file and translate it
@@ -18,8 +27,11 @@ with open("main.json", "r") as quotes_file:
 
     count = 0
     for quote in quotes:
-        translator = Translator()
-        translation = translator.translate(quote["quote"], dest=lang).text
+        urllib.request.urlretrieve('https://argosopentech.nyc3.digitaloceanspaces.com/argospm/translate-en_nl-1_4.argosmodel', 'translate-en_nl-1_4.argosmodel')
+        download_path = "translate-en_nl-1_4.argosmodel"
+        argostranslate.package.install_from_path(download_path)
+        argos_ru_en = get_argos_model('English', 'Dutch')
+        translation = argos_ru_en.translate(quote['quote'])
         # save the translation in a new JSON file
         with open(f"file_{lang}.json", "a",  encoding="utf-8") as quotes_file:
             f = open(f"file_{lang}.json", "a")
@@ -53,3 +65,4 @@ with open(f"file_{lang}.json", "r") as quotes_file:
 
 with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
     f.write(json.dumps(quotes, indent=2))
+
