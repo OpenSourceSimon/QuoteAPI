@@ -69,28 +69,28 @@ if forinto == 5000:
         filehandle.truncate()
         filehandle.write(']'.encode('utf-8'))
         filehandle.close()
-obj  = json.load(open(f"file_{lang}.json"))
-last_start_time = time.time()
-with open(f"file_{lang}.json", "r") as quotes_file:
-    quotes = json.load(quotes_file)
-    num = 0
-    for quote in quotes:
-        for idx, obj in enumerate(quotes):
-            import re
-            def corr(s):
-                sub = re.sub(r'\.(?! )', '. ', re.sub(r' +', ' ', s))
-                return sub
+    obj  = json.load(open(f"file_{lang}.json"))
+    last_start_time = time.time()
+    with open(f"file_{lang}.json", "r") as quotes_file:
+        quotes = json.load(quotes_file)
+        num = 0
+        for quote in quotes:
+            for idx, obj in enumerate(quotes):
+                import re
+                def corr(s):
+                    sub = re.sub(r'\.(?! )', '. ', re.sub(r' +', ' ', s))
+                    return sub
 
-            num += 1
-            speed = count / (last_start_time - time.time())  * -1
-            remaining_time = get_remaining_time(speed, quote_count, count)
-            print(f'{num} of {quote_count} quotes translated, {round(speed, 3)} quotes/s, {remaining_time} remaining')
-            obj['quote'] = corr(obj['quote'])
-            if '\u00ef\u00bf\u00bd' in obj['quote']:
-                quotes.pop(idx)
-                print("Removed quote")
+                num += 1
+                speed = count / (last_start_time - time.time())  * -1
+                remaining_time = get_remaining_time(speed, quote_count, count)
+                print(f'{num} of {quote_count} quotes translated, {round(speed, 3)} quotes/s, {remaining_time} remaining')
+                obj['quote'] = corr(obj['quote'])
+                if '\u00ef\u00bf\u00bd' in obj['quote']:
+                    quotes.pop(idx)
+                    print("Removed quote")
 
-with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
-    f.write(json.dumps(quotes, indent=2))
-    f.close()
-    print("Done with reformatting the file")
+    with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
+        f.write(json.dumps(quotes, indent=2))
+        f.close()
+        print("Done with reformatting the file")
