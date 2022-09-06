@@ -1,13 +1,13 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Translate to Dutch
+name: Translate first 15
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events
   push:
-    branches: [ "quote" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "quote" ]
+    branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch: 
@@ -30,20 +30,35 @@ jobs:
       - name: Install dependencies
         run: pip3 install googletrans==4.0.0rc1 argostranslate
         
-      - name: Run Python from 0 to 1000
-        run: python main.py 0 1000
+      - name: Run Python from 0 to 4000 in fr
+        run: python main.py 0 4000 fr
         
-      - name: Run Python from 1000 to 2000
-        run: python main.py 1000 2000
+      - name: Run Python from 4000 to 5000 in fr
+        run: python main.py 4000 5000 fr
+
+      - name: Run Python from 0 to 4000 in ga
+        run: python main.py 0 4000 ga
         
-      - name: Run Python from 2000 to 3000
-        run: python main.py 2000 3000
+      - name: Run Python from 4000 to 5000 in ga
+        run: python main.py 4000 5000 ga
+
+      - name: Run Python from 0 to 4000 in he
+        run: python main.py 0 4000 he
         
-      - name: Run Python from 3000 to 4000
-        run: python main.py 3000 4000
+      - name: Run Python from 4000 to 5000 in he
+        run: python main.py 4000 5000 he
+
+      - name: Run Python from 0 to 4000 in hi
+        run: python main.py 0 4000 hi
         
-      - name: Run Python from 4000 to 5000
-        run: python main.py 4000 5000
+      - name: Run Python from 4000 to 5000 in hi
+        run: python main.py 4000 5000 hi
+
+      - name: Run Python from 0 to 4000 in hu
+        run: python main.py 0 4000 hu
+        
+      - name: Run Python from 4000 to 5000 in hu
+        run: python main.py 4000 5000 hu
         
       - name: Commit files
         id: commit
@@ -54,7 +69,7 @@ jobs:
           if [-z "$(git status --porcelain)"]; then
             echo "::set-output name=push::false"
           else
-            git commit -m "Add changes" -a
+            git commit -m "Added translation" -a
             echo "::set-output name=push::true"
           fi
         shell: bash
