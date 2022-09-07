@@ -86,6 +86,8 @@ with open("main.json", "r") as quotes_file:
                     print(f'Finished translating {quote_count} quotes')
                     count += 1
                     break
+                elif count == forinto:
+                    break
                 else:
                     text = translation.encode('utf-8')
                     final = text.decode('utf-8')
