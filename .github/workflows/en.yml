@@ -1,0 +1,59 @@
+
+name: Translate to English
+
+on:
+  # Triggers the workflow on push or pull request events
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get files from repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4.2.0
+
+      - name: Install dependencies
+        run: pip3 install googletrans==4.0.0rc1 argostranslate
+
+      - name: Run Python from 0 to 1000
+        run: python main.py 0 1000 en
+
+      - name: Run Python from 1000 to 2000
+        run: python main.py 1000 2000 en
+
+      - name: Run Python from 2000 to 3000
+        run: python main.py 2000 3000 en
+
+      - name: Run Python from 3000 to 4000
+        run: python main.py 3000 4000 en
+
+      - name: Run Python from 4000 to 5000
+        run: python main.py 4000 5000 en
+
+      - name: Commit files
+        id: commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "github-actions"
+          git add --all
+          if [-z "$(git status --porcelain)"]; then
+            echo "::set-output name=push::false"
+          else
+            git commit -m "Added translation" -a
+            echo "::set-output name=push::true"
+          fi
+        shell: bash
+      - name: Push changes
+        if: steps.commit.outputs.push == 'true'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
