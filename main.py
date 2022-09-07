@@ -62,8 +62,10 @@ with open("main.json", "r") as quotes_file:
         print("File already exists")
     else:
         print("The file does not exist, generating new file")
+
+
     def translation():
-        urllib.request.urlretrieve(f'https://argosopentech.nyc3.digitaloceanspaces.com/argospm/{path}', path)
+        urllib.request.urlretrieve(f'https://simonrijntjes.nl/argosmodel/{path}', path)
         count = 0
         for quote in quotes:
             if count < forinfrom:
@@ -76,21 +78,26 @@ with open("main.json", "r") as quotes_file:
             translation = argos.translate(quote['quote'])
             # save the translation in a new JSON file
             with open(f"file_{lang}.json", "a", encoding='utf-8') as f:
-                # Write the quote and author to the file
-                text = translation.encode('utf-8')
-                final = text.decode('utf-8')
-                f.write(f'{{"quote": "{final}", "author": "{quote["author"]}"}}')
-                f.close()
-                count += 1
-                speed = (forinfrom - count) / (start_time - time.time())
-                remaining_time = get_remaining_time(speed, forinto, forinfrom, count)
-                print(
-                    f'{count} of {quote_count} quotes translated. {round(speed, 2)} quotes per second. {remaining_time} remaining')
-            if count == forinto:
-                print(f'Done. Onto the next batch!')
-                count += 1
-                break
+                if count == quote_count or count < quote_count:
+                    text = translation.encode('utf-8')
+                    final = text.decode('utf-8')
+                    f.write(f'{{"quote": "{final}", "author": "{quote["author"]}"}}]')
+                    f.close()
+                    print(f'Finished translating {quote_count} quotes')
+                    count += 1
+                    break
+                else:
+                    text = translation.encode('utf-8')
+                    final = text.decode('utf-8')
+                    f.write(f'{{"quote": "{final}", "author": "{quote["author"]}"}},')
+                    f.close()
+                    count += 1
+                    speed = (forinfrom - count) / (start_time - time.time())
+                    remaining_time = get_remaining_time(speed, forinto, forinfrom, count)
+                    print(
+                        f'{count} of {quote_count} quotes translated. {round(speed, 2)} quotes per second. {remaining_time} remaining')
         print("Done with translating quotes. Now reformatting the file")
+
 
     if forinfrom == 0:
         with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
@@ -102,11 +109,6 @@ with open("main.json", "r") as quotes_file:
 
     # Opens the json file and removes the whole quote and author if unkown characters are found
     if forinto == 5000:
-        with open(f"file_{lang}.json", 'rb+') as filehandle:
-            filehandle.seek(-1, os.SEEK_END)
-            filehandle.truncate()
-            filehandle.write(']'.encode('utf-8'))
-            filehandle.close()
         obj = json.load(open(f"file_{lang}.json"))
         last_start_time = time.time()
         with open(f"file_{lang}.json", "r") as quotes_file:
@@ -123,7 +125,8 @@ with open("main.json", "r") as quotes_file:
                     speed = num / (last_start_time - time.time()) * -1
                     print(f'{num} of {quote_count} quotes reformated, {round(speed, 3)} quotes/s')
                     obj['quote'] = corr(obj['quote'])
-                    if '\u00ef\u00bf\u00bd' in obj['quote']:
+                    if '\u00ef\u00bf\u00bd' in obj['quote'] or '\u00ef\u00bf\u00bd' in obj['author'] or 'Ã«' in obj[
+                        'quote']:
                         quotes.pop(idx)
                         print("Removed quote")
 
