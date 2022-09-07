@@ -78,7 +78,7 @@ with open("main.json", "r") as quotes_file:
             translation = argos.translate(quote['quote'])
             # save the translation in a new JSON file
             with open(f"file_{lang}.json", "a", encoding='utf-8') as f:
-                if count == quote_count or count < quote_count:
+                if count == quote_count - 1:
                     text = translation.encode('utf-8')
                     final = text.decode('utf-8')
                     f.write(f'{{"quote": "{final}", "author": "{quote["author"]}"}}]')
@@ -96,8 +96,6 @@ with open("main.json", "r") as quotes_file:
                     remaining_time = get_remaining_time(speed, forinto, forinfrom, count)
                     print(
                         f'{count} of {quote_count} quotes translated. {round(speed, 2)} quotes per second. {remaining_time} remaining')
-        print("Done with translating quotes. Now reformatting the file")
-
 
     if forinfrom == 0:
         with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
@@ -109,6 +107,7 @@ with open("main.json", "r") as quotes_file:
 
     # Opens the json file and removes the whole quote and author if unkown characters are found
     if forinto == 5000:
+        print("Now reformatting the file")
         obj = json.load(open(f"file_{lang}.json"))
         last_start_time = time.time()
         with open(f"file_{lang}.json", "r") as quotes_file:
