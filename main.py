@@ -1,9 +1,10 @@
 import json
 import os
+import re
 import sys
 import time
 import urllib.request
-import re
+
 import argostranslate.package
 import argostranslate.translate
 from argostranslate import translate
@@ -28,7 +29,7 @@ def get_remaining_time(speed, forinto, forinfrom, count):
 
 
 start_time = time.time()
-# get quote from JSON file and translate it
+
 with open("main.json", "r") as quotes_file:
     quotes = json.load(quotes_file)
     # Gets all the quotes from the JSON file and counts how many there are
@@ -61,19 +62,14 @@ with open("main.json", "r") as quotes_file:
         print("File already exists")
     else:
         print("The file does not exist, generating new file")
-    # Add [ to the file and remove all of it contents
-    if forinfrom == 0:
-        with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
-            f.write("[")
-            f.close()
-
+    def translation():
+        urllib.request.urlretrieve(f'https://argosopentech.nyc3.digitaloceanspaces.com/argospm/{path}', path)
         count = 0
         for quote in quotes:
             if count < forinfrom:
                 count += 1
                 continue
             # Download the model
-            urllib.request.urlretrieve(f'https://argosopentech.nyc3.digitaloceanspaces.com/argospm/{path}', path)
             download_path = path
             argostranslate.package.install_from_path(download_path)
             argos = get_argos_model('English', getmodel[lang])
@@ -95,6 +91,14 @@ with open("main.json", "r") as quotes_file:
                 count += 1
                 break
         print("Done with translating quotes. Now reformatting the file")
+
+    if forinfrom == 0:
+        with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
+            f.write("[")
+            f.close()
+            translation()
+    else:
+        translation()
 
     # Opens the json file and removes the whole quote and author if unkown characters are found
     if forinto == 5000:
