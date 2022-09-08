@@ -96,8 +96,7 @@ with open("main.json", "r") as quotes_file:
                     count += 1
                     speed = (forinfrom - count) / (start_time - time.time())
                     remaining_time = get_remaining_time(speed, forinto, forinfrom, count)
-                    print(
-                        f'{count} of {quote_count} quotes translated. {round(speed, 2)} quotes per second. {remaining_time} remaining')
+                    print(f'{count} of {quote_count} quotes translated. {round(speed, 2)} quotes per second. {remaining_time} remaining')
 
     if forinfrom == 0:
         with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
@@ -126,8 +125,7 @@ with open("main.json", "r") as quotes_file:
                     speed = num / (last_start_time - time.time()) * -1
                     print(f'{num} of {quote_count} quotes reformated, {round(speed, 3)} quotes/s')
                     obj['quote'] = corr(obj['quote'])
-                    if '\u00ef\u00bf\u00bd' in obj['quote'] or '\u00ef\u00bf\u00bd' in obj['author'] or 'Ã«' in obj[
-                        'quote']:
+                    if r'\u' in obj['author'] or r'\u' in obj['quote']:
                         quotes.pop(idx)
                         print("Removed quote")
 
