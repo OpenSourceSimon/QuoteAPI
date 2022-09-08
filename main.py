@@ -35,8 +35,8 @@ with open("main.json", "r") as quotes_file:
     # Gets all the quotes from the JSON file and counts how many there are
     quote_count = len(quotes)
     print(f'Loaded {quote_count} quotes')
-    forinfrom = int(sys.argv[1])
-    forinto = int(sys.argv[2])
+    for_in_from = int(sys.argv[1])
+    for_in_to = int(sys.argv[2])
     lang = sys.argv[3]
     argosmodels = {"ar": "translate-en_ar-1_0.argosmodel", "az": "translate-en_az-1_5.argosmodel",
                    "cs": "translate-en_cs-1_5.argosmodel", "da": "translate-en_da-1_3.argosmodel",
@@ -53,7 +53,7 @@ with open("main.json", "r") as quotes_file:
                    "sv": "translate-en_sv-1_5.argosmodel", "tr": "translate-en_tr-1_5.argosmodel",
                    "uk": "translate-en_uk-1_4.argosmodel", "zh": "translate-en_zh-1_1.argosmodel"}
     path = argosmodels[lang]
-    getmodel = {"ar": "Arabic", "az": "Azerbaijani", "cs": "Czech", "da": "Danish", "de": "German", "el": "Greek",
+    get_model = {"ar": "Arabic", "az": "Azerbaijani", "cs": "Czech", "da": "Danish", "de": "German", "el": "Greek",
                 "eo": "Esperanto", "es": "Spanish", "fa": "Persian", "fi": "Finnish", "fr": "French", "ga": "Irish",
                 "he": "Hebrew", "hi": "Hindi", "hu": "Hungarian", "id": "Indonesian", "it": "Italian", "ja": "Japanese",
                 "ko": "Korean", "nl": "Dutch", "pl": "Polish", "pt": "Portuguese", "ru": "Russian", "sk": "Slovak",
@@ -68,68 +68,41 @@ with open("main.json", "r") as quotes_file:
         urllib.request.urlretrieve(f'https://simonrijntjes.nl/argosmodel/{path}', path)
         count = 0
         for quote in quotes:
-            if count < forinfrom:
+            if count < for_in_from:
                 count += 1
                 continue
             # Download the model
             download_path = path
             argostranslate.package.install_from_path(download_path)
-            argos = get_argos_model('English', getmodel[lang])
+            argos = get_argos_model('English', get_model[lang])
             translation = argos.translate(quote['quote'])
-            # save the translation in a new JSON file
-            with open(f"file_{lang}.json", "a", encoding='utf-8') as f:
+            with open(f"file_{lang}.json", "a", encoding='utf-8', ) as file:
                 if count == quote_count - 1:
                     text = translation.encode('utf-8')
                     final = text.decode('utf-8')
-                    f.write(f'{{"quote": "{final}", "author": "{quote["author"]}"}}]')
-                    f.close()
+                    file.write(f'{{"quote": "{final}", "author": "{quote["author"]}"}}]')
+                    file.close()
                     print(f'Finished translating {quote_count} quotes')
                     count += 1
                     break
-                elif count == forinto:
+                elif count == for_in_to:
                     break
                 else:
                     text = translation.encode('utf-8')
                     final = text.decode('utf-8')
-                    f.write(f'{{"quote": "{final}", "author": "{quote["author"]}"}},')
-                    f.close()
+                    file.write(f'{{"quote": "{final}", "author": "{quote["author"]}"}},')
+                    file.close()
                     count += 1
-                    speed = (forinfrom - count) / (start_time - time.time())
-                    remaining_time = get_remaining_time(speed, forinto, forinfrom, count)
-                    print(f'{count} of {quote_count} quotes translated. {round(speed, 2)} quotes per second. {remaining_time} remaining')
+                    speed = (for_in_from - count) / (start_time - time.time())
+                    remaining_time = get_remaining_time(speed, for_in_to, for_in_from, count)
+                    print(
+                        f'{count} of {quote_count} quotes translated. {round(speed, 2)} quotes per second. {remaining_time} remaining')
 
-    if forinfrom == 0:
+
+    if for_in_from == 0:
         with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
             f.write("[")
             f.close()
             translation()
     else:
         translation()
-
-    # Opens the json file and removes the whole quote and author if unkown characters are found
-    if forinto == 5000:
-        print("Now reformatting the file")
-        obj = json.load(open(f"file_{lang}.json"))
-        last_start_time = time.time()
-        with open(f"file_{lang}.json", "r") as quotes_file:
-            quotes = json.load(quotes_file)
-            num = 0
-            for quote in quotes:
-                for idx, obj in enumerate(quotes):
-                    def corr(s):
-                        sub = re.sub(r'\.(?! )', '. ', re.sub(r' +', ' ', s))
-                        return sub
-
-
-                    num += 1
-                    speed = num / (last_start_time - time.time()) * -1
-                    print(f'{num} of {quote_count} quotes reformated, {round(speed, 3)} quotes/s')
-                    obj['quote'] = corr(obj['quote'])
-                    if r'\u' in obj['author'] or r'\u' in obj['quote']:
-                        quotes.pop(idx)
-                        print("Removed quote")
-
-        with open(f"file_{lang}.json", 'w', encoding='utf-8') as f:
-            f.write(json.dumps(quotes, indent=2))
-            f.close()
-            print("Done with reformatting the file")
