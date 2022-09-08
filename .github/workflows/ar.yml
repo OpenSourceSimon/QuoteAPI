@@ -45,6 +45,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "github-actions"
           git add --all
+          git pull origin main
           if [-z "$(git status --porcelain)"]; then
             echo "::set-output name=push::false"
           else
@@ -57,3 +58,12 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          
+      - name: On failure push changes again
+        if: failure() && steps.commit.outputs.push == 'true'
+        uses: ad-m/github-push-action@master
+        with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            branch: main
+        
