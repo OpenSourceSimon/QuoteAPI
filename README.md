@@ -16,3 +16,6 @@ GET https://simonrijntjes.nl/quote.php?lang=nl
 If you want to add a quote, please create a pull request with the quote in the `main.json` file. Thanks in advance! <br>
 Please don't edit the translations, they are automatically generated. The translation library this project currently uses is Argos Translate.
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## Bugs
+- [ ] The `quote.php` doesn't work with a special character language like Arabic. 
