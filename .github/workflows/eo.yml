@@ -38,6 +38,12 @@ jobs:
 
       - name: Run Python from 4000 to 5000
         run: python main.py 4000 5000 eo
+        
+      - name: Run Python from 5000 to 6000
+        run: python main.py 5000 6000 eo
+        
+      - name: Run Python from 6000 to 7000
+        run: python main.py 6000 7000 eo
 
       - name: Commit files
         id: commit
